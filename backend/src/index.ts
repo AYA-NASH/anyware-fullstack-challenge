@@ -1,6 +1,9 @@
+import { Request, Response, NextFunction } from "express";
+
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import announcementRoutes from "./routes/announcements";
 
 dotenv.config();
 
@@ -14,6 +17,22 @@ app.get("/", (req, res) => {
   res.send("API is running");
 });
 
+app.use("/api/", announcementRoutes);
+
+app.use(
+  (error: any, req: Request, res: Response, next: NextFunction) => {
+    console.log("Error Middleware -----\nError: ", error);
+
+    const status = error.statusCode || 500;
+    const message = error.message || "Something went wrong.";
+    const errorData = error.data || null;
+
+    res.status(status).json({
+      message,
+      data: errorData,
+    });
+  }
+);
 
 mongoose.connect(
     process.env.MONGO_URI || ""
