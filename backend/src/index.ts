@@ -4,6 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import announcementRoutes from "./routes/announcements";
+import quizRoutes from "./routes/quiz";
 
 dotenv.config();
 
@@ -17,7 +18,10 @@ app.get("/", (req, res) => {
   res.send("API is running");
 });
 
-app.use("/api/", announcementRoutes);
+app.use("/api/announcements", announcementRoutes);
+
+app.use("/api/quizes", quizRoutes);
+
 
 app.use(
   (error: any, req: Request, res: Response, next: NextFunction) => {

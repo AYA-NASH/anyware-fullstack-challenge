@@ -69,9 +69,7 @@ export const updateAnnouncement = async (
     const fetchedAnnouncement = await Announcement.findById(announcementId);
     
     if (!fetchedAnnouncement) {
-      const error: any = new Error("Announcement not found!");
-      error.statusCode = 404;
-      throw error;
+      return res.status(404).json({ message: "Quiz not found" });
     }
     
     const {title, content} = req.body;

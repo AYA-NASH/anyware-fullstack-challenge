@@ -4,12 +4,12 @@ import { createAnnouncement, deleteAnnouncement, getAnnouncements, updateAnnounc
 
 const router = express.Router();
 
-router.get("/announcements", getAnnouncements);
+router.get("/", getAnnouncements);
 
-router.post("/announcements", createAnnouncement);
+router.post("/", createAnnouncement);
 
-router.put("/announcements/:id", updateAnnouncement);
+router.put("/:id", updateAnnouncement);
 
-router.delete("/announcements/:id", deleteAnnouncement);
+router.delete("/:id", deleteAnnouncement);
 
 export default router;
