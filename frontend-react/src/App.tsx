@@ -1,13 +1,31 @@
-import Counter from "./Counter";
-import { Button } from "@mui/material";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
+import WelcomePage from "./pages/WelcomePage";
+import Dashboard from "./pages/Dashboard";
+import { RequireAuth } from "./state/auth/RequireAuth";
+
 function App() {
     return (
-        <div>
-            <h1> Anyware Task</h1>
-            <Button variant="contained">Hello World</Button>
-            <h2>Redux Tutorial</h2>
-            <Counter />
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/login" element={<WelcomePage />} />
+
+                <Route
+                    path="/dashboard"
+                    element={
+                        <RequireAuth>
+                            <Dashboard />
+                        </RequireAuth>
+                    }
+                />
+
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        </Router>
     );
 }
 
