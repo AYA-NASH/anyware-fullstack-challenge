@@ -9,8 +9,8 @@ import {
 import AnnouncementCard from "./MainSection/AnnouncementCard";
 import TaskCard from "./MainSection/TaskCard";
 import { useEffect, useState } from "react";
+import { baseUrl } from "../../config"; 
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 interface AnnouncementData {
     _id: string;
