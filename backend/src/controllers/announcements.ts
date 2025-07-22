@@ -2,13 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import { Announcement } from "../models/announcements";
 import mongoose from "mongoose";
 
+interface AnnouncementRequestBody {
+  senderName: string;
+  senderRole: string;
+  content: string;
+}
+
 export const getAnnouncements = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const announcements = await Announcement.find();
+    const announcements = await Announcement.find(); 
 
     res.status(200).json({
       message: "Announcements fetched successfully",
@@ -20,43 +26,42 @@ export const getAnnouncements = async (
 };
 
 export const createAnnouncement = async (
-  req: Request,
+  req: Request<{}, {}, AnnouncementRequestBody>, 
   res: Response,
   next: NextFunction
-) =>{
+) => {
+  const { senderName, senderRole, content } = req.body; 
 
-  const {title, content} = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ message: "Title and content are required" });
+  if (!senderName || !senderRole || !content) { 
+    return res.status(400).json({ message: "Sender name, sender role, and content are required" });
   }
 
-  try{
-
+  try {
     const newAnnouncement = new Announcement({
-      title: title,
-      content: content
+      senderName: senderName, 
+      senderRole: senderRole, 
+      content: content 
     });
 
     const savedAnnouncement = await newAnnouncement.save();
 
     res.status(201).json({
-      message: "new Announcment Added!",
+      message: "New Announcement added!",
       result: savedAnnouncement
     });
 
-  } catch(err){
+  } catch (err) {
     next(err);
   }
 };
 
 export const updateAnnouncement = async (
-  req: Request,
+  req: Request<{ id: string }, {}, AnnouncementRequestBody>, 
   res: Response,
   next: NextFunction
-) =>{
+) => {
   const announcementId = req.params.id;
-  
+
   if (!announcementId) {
     return res.status(400).json({ message: "Announcement ID is required." });
   }
@@ -65,17 +70,18 @@ export const updateAnnouncement = async (
     return res.status(400).json({ message: "Invalid ID format." });
   }
 
-  try{
+  try {
     const fetchedAnnouncement = await Announcement.findById(announcementId);
-    
-    if (!fetchedAnnouncement) {
-      return res.status(404).json({ message: "Quiz not found" });
-    }
-    
-    const {title, content} = req.body;
 
-    if(title) fetchedAnnouncement.title = title;
-    if(content) fetchedAnnouncement.content = content;
+    if (!fetchedAnnouncement) {
+      return res.status(404).json({ message: "Announcement not found" }); 
+    }
+
+    const { senderName, senderRole, content } = req.body;
+
+    if (senderName !== undefined) fetchedAnnouncement.senderName = senderName; 
+    if (senderRole !== undefined) fetchedAnnouncement.senderRole = senderRole;
+    if (content !== undefined) fetchedAnnouncement.content = content;
 
     const savedAnnouncement = await fetchedAnnouncement.save();
 
@@ -84,15 +90,13 @@ export const updateAnnouncement = async (
       result: savedAnnouncement,
     });
 
-  } catch(err){
+  } catch (err) {
     next(err);
   }
-
-
 };
 
 export const deleteAnnouncement = async (
-  req: Request,
+  req: Request<{ id: string }>, 
   res: Response,
   next: NextFunction
 ) => {
@@ -115,9 +119,9 @@ export const deleteAnnouncement = async (
       throw error;
     }
 
-  res.status(200).json({
-    message: "Announcement deleted successfully!"
-  });
+    res.status(200).json({
+      message: "Announcement deleted successfully!"
+    });
 
   } catch (err) {
     next(err);
