@@ -2,6 +2,23 @@ import { Request, Response, NextFunction } from "express";
 import { Quiz } from "../models/quiz";
 import mongoose from "mongoose";
 
+interface QuizRequestBody {
+  title: string;
+  description?: string;
+  duration: number;
+  startDate?: string;
+  endDate?: string;
+  totalMarks: number;
+  questions: Array<{
+    questionText: string;
+    options: string[];
+    correctOptionIndex: number;
+  }>;
+  course: string;
+  topic: string;
+  dueDate: string;
+}
+
 export const getQuizzes = async (
   req: Request,
   res: Response,
@@ -19,8 +36,8 @@ export const getQuizzes = async (
 };
 
 export const getQuizById = async (
-    req: Request,
-    res: Response, 
+    req: Request<{ id: string }>,
+    res: Response,
     next: NextFunction
 ) => {
   try {
@@ -46,18 +63,16 @@ export const getQuizById = async (
 };
 
 export const createQuiz = async (
-    req: Request, 
-    res: Response, 
+    req: Request<{}, {}, QuizRequestBody>,
+    res: Response,
     next: NextFunction
 ) => {
-
   try {
+    const { title, description, duration, startDate, endDate, totalMarks, questions, course, topic, dueDate } = req.body;
 
-    const { title, description, duration, startDate, endDate, totalMarks, questions } = req.body;
-
-    if (!title || !startDate || !Array.isArray(questions) || questions.length < 1 || !duration || !totalMarks) {
+    if (!title || !duration || !totalMarks || !Array.isArray(questions) || questions.length < 1 || !course || !topic || !dueDate) {
         return res.status(400).json({
-            message: "Missing required fields: title, startDate, duration, or questions",
+            message: "Missing required fields: title, duration, totalMarks, questions, course, topic, or dueDate",
         });
     }
 
@@ -83,6 +98,9 @@ export const createQuiz = async (
         endDate,
         totalMarks,
         questions,
+        course,
+        topic,
+        dueDate: new Date(dueDate),
     });
 
     const savedQuiz = await newQuiz.save();
@@ -97,7 +115,7 @@ export const createQuiz = async (
 };
 
 export const updateQuiz = async (
-  req: Request,
+  req: Request<{ id: string }, {}, Partial<QuizRequestBody>>,
   res: Response,
   next: NextFunction
 ) => {
@@ -113,20 +131,23 @@ export const updateQuiz = async (
 
   try {
     const fetchedQuiz = await Quiz.findById(quizId);
-    
+
     if (!fetchedQuiz) {
       return res.status(404).json({ message: "Quiz not found" });
     }
 
-    const { title, description, duration, startDate, endDate, totalMarks, questions } = req.body;
+    const { title, description, duration, startDate, endDate, totalMarks, questions, course, topic, dueDate } = req.body;
 
-    if (title) fetchedQuiz.title = title;
-    if (description) fetchedQuiz.description = description;
-    if (duration) fetchedQuiz.duration = duration;
-    if (questions) fetchedQuiz.questions = questions;
-    if (totalMarks) fetchedQuiz.totalMarks = totalMarks;
-    if (startDate) fetchedQuiz.startDate = startDate;
-    if (endDate) fetchedQuiz.endDate = endDate;
+    if (title !== undefined) fetchedQuiz.title = title;
+    if (description !== undefined) fetchedQuiz.description = description;
+    if (duration !== undefined) fetchedQuiz.duration = duration;
+    if (questions !== undefined) fetchedQuiz.questions = questions;
+    if (totalMarks !== undefined) fetchedQuiz.totalMarks = totalMarks;
+    if (startDate !== undefined) fetchedQuiz.startDate = startDate;
+    if (endDate !== undefined) fetchedQuiz.endDate = endDate;
+    if (course !== undefined) fetchedQuiz.course = course;
+    if (topic !== undefined) fetchedQuiz.topic = topic;
+    if (dueDate !== undefined) fetchedQuiz.dueDate = new Date(dueDate);
 
     const savedQuiz = await fetchedQuiz.save();
 
@@ -140,8 +161,8 @@ export const updateQuiz = async (
 };
 
 export const deleteQuiz = async (
-    req: Request, 
-    res: Response, 
+    req: Request<{ id: string }>,
+    res: Response,
     next: NextFunction
 ) => {
   try {

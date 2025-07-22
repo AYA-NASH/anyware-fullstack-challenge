@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import announcementRoutes from "./routes/announcements";
 import quizRoutes from "./routes/quiz";
+import assignmentRoutes from "./routes/assignment";
 
 dotenv.config();
 
@@ -23,8 +24,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use("/api/announcements", announcementRoutes);
 
-app.use("/api/quizes", quizRoutes);
+app.use("/api/quizzes", quizRoutes);
 
+app.use("/api/assignments", assignmentRoutes);
 
 app.use(
   (error: any, req: Request, res: Response, next: NextFunction) => {

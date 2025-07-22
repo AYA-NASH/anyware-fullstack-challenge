@@ -12,14 +12,28 @@ const quizSchema = new Schema({
     required: true,
   },
 
-  description: String,
-  duration: Number,
+  course: {
+    type: String,
+    required: true,
+    trim: true,
+  },
 
-  startDate: Date,
-  endDate: Date,
+  topic: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+
+  dueDate: {
+    type: Date,
+    required: true,
+  },
+
+  description: String,
+  duration: Number, 
   totalMarks: Number,
 
-  questions: [
+  questions: [ 
     {
       questionText: { type: String, required: true },
       options: {

@@ -21,6 +21,15 @@ interface AnnouncementData {
     updatedAt: string;
 }
 
+interface TaskData {
+    _id: string;
+    type: "quiz" | "assignment";
+    title: string;
+    course: string;
+    topic: string;
+    dueDate: string;
+}
+
 const MainContent = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -31,6 +40,10 @@ const MainContent = () => {
     const [announcementsError, setAnnouncementsError] = useState<string | null>(
         null
     );
+
+    const [tasks, setTasks] = useState<TaskData[]>([]);
+    const [loadingTasks, setLoadingTasks] = useState<boolean>(true);
+    const [tasksError, setTasksError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchAnnouncements = async () => {
@@ -51,6 +64,67 @@ const MainContent = () => {
         };
 
         fetchAnnouncements();
+    }, []);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            const url = baseUrl + "/api";
+            try {
+                const [quizzesResponse, assignmentsResponse] =
+                    await Promise.all([
+                        fetch(`${url}/quizzes`),
+                        fetch(`${url}/assignments`),
+                    ]);
+
+                if (!quizzesResponse.ok) {
+                    throw new Error(
+                        `HTTP error! Quizzes status: ${quizzesResponse.status}`
+                    );
+                }
+                if (!assignmentsResponse.ok) {
+                    throw new Error(
+                        `HTTP error! Assignments status: ${assignmentsResponse.status}`
+                    );
+                }
+
+                const quizzesData = await quizzesResponse.json();
+                const assignmentsData = await assignmentsResponse.json();
+
+                const allTasks: TaskData[] = [
+                    ...quizzesData.result.map((quiz: any) => ({
+                        _id: quiz._id,
+                        type: "quiz",
+                        title: quiz.title,
+                        course: quiz.course,
+                        topic: quiz.topic,
+                        dueDate: quiz.dueDate,
+                    })),
+                    ...assignmentsData.result.map((assignment: any) => ({
+                        _id: assignment._id,
+                        type: "assignment",
+                        title: assignment.title,
+                        course: assignment.course,
+                        topic: assignment.topic,
+                        dueDate: assignment.dueDate,
+                    })),
+                ];
+
+                const sortedTasks = allTasks.sort(
+                    (a, b) =>
+                        new Date(a.dueDate).getTime() -
+                        new Date(b.dueDate).getTime()
+                );
+
+                setTasks(sortedTasks);
+            } catch (error: any) {
+                console.error("Error fetching tasks:", error);
+                setTasksError("Failed to load what's due.");
+            } finally {
+                setLoadingTasks(false);
+            }
+        };
+
+        fetchTasks();
     }, []);
 
     const formatDueDate = (isoDateString: string) => {
@@ -155,20 +229,31 @@ const MainContent = () => {
                         All
                     </Typography>
                 </Box>
-                <TaskCard
-                    type="quiz"
-                    title="Unit 2 quiz"
-                    course="Physics 02"
-                    topic="Unit2: Motion and forces"
-                    dueDate="20 Dec 2017 - 09:00 PM"
-                />
-                <TaskCard
-                    type="assignment"
-                    title="12-12 Assignment"
-                    course="Arabic K12"
-                    topic="-------"
-                    dueDate="20 Dec 2017 - 09:00 PM"
-                />
+                {loadingTasks && (
+                    <CircularProgress
+                        sx={{ display: "block", margin: "20px auto" }}
+                    />
+                )}
+                {tasksError && <Alert severity="error">{tasksError}</Alert>}
+
+                {!loadingTasks &&
+                    !tasksError &&
+                    (tasks.length > 0 ? (
+                        tasks.map((task) => (
+                            <TaskCard
+                                key={task._id}
+                                type={task.type}
+                                title={task.title}
+                                course={task.course}
+                                topic={task.topic}
+                                dueDate={formatDueDate(task.dueDate)}
+                            />
+                        ))
+                    ) : (
+                        <Typography variant="body2" color="text.secondary">
+                            No tasks due.
+                        </Typography>
+                    ))}
             </Box>
         </Box>
     );
