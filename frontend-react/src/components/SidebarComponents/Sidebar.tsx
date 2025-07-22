@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import sidebarData from "./SidebarData";
-import { hoverStyles } from "../styles/themeStyles";
+import { hoverStyles } from "../../styles/themeStyles";
 
 const Sidebar: React.FC = () => {
     const navigate = useNavigate();

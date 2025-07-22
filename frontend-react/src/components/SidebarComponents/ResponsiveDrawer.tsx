@@ -12,7 +12,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./Sidebar";
 import { useTheme } from "@mui/material/styles";
-import { drawerWidth, sidebarGradient } from "../styles/themeStyles";
+import { drawerWidth, sidebarGradient } from "../../styles/themeStyles";
 import Logo from "./Logo";
 
 const ResponsiveDrawer: React.FC<{ children: React.ReactNode }> = ({
