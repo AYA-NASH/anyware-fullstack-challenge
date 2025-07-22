@@ -3,15 +3,19 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store";
-import { login } from "../state/auth/authSlice";
+import { login, startLogoutTimer } from "../state/auth/authSlice";
 import { Box, Card, CardContent, Typography, Button } from "@mui/material";
 
 const WelcomePage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
+    const SESSION_TIMEOUT = 5 * 1000;
+
     const handleLogin = () => {
         dispatch(login());
+        localStorage.setItem("auth", "true");
+        dispatch(startLogoutTimer(SESSION_TIMEOUT));
         navigate("/dashboard");
     };
 

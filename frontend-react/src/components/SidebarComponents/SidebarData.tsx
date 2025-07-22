@@ -4,6 +4,7 @@ import ClassIcon from "@mui/icons-material/Class";
 import SchoolIcon from "@mui/icons-material/School";
 import InsightsIcon from "@mui/icons-material/Insights";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { ReactElement } from "react";
 
 interface SidebarItem {
@@ -19,6 +20,7 @@ const sidebarData: SidebarItem[] = [
     { label: "Gradebook", path: "/gradebook", icon: <SchoolIcon /> },
     { label: "Performance", path: "/performance", icon: <InsightsIcon /> },
     { label: "Announcement", path: "/announcement", icon: <CampaignIcon /> },
+    { label: "Logout", path: "/logout", icon: <LogoutIcon /> },
 ];
 
 export default sidebarData;
