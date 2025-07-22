@@ -20,17 +20,17 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    login(state) {
+    login(state: AuthState) {
       state.authorized = true;
     },
-    logout(state) {
+    logout(state: AuthState) {
       state.authorized = false;
        if (logoutTimer) {
           clearTimeout(logoutTimer);
           logoutTimer = null;
         }
     },
-    setLogoutTimerId(state, action: PayloadAction<number | null>) {
+    setLogoutTimerId(state: AuthState, action: PayloadAction<number | null>) {
       state.logoutTimerId = action.payload;
     },
   },
